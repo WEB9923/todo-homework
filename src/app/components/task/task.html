@@ -1,0 +1,186 @@
+<div class="">
+  <header class="flex justify-end gap-2 bg-slate-950/20 px-2 py-1 rounded-md">
+    <button
+      (click)="sortByPriority()"
+      class="btn hover:bg-slate-800 text-sm"
+      [class.bg-slate-800]="isPrioritySorted"
+    >
+      <svg
+        lucideSettings2
+        [size]="20"
+      ></svg>
+      Sorted by priority
+    </button>
+
+    <div class="relative">
+      <button
+        (click)="toggleShowMenu()"
+        class="btn-icon hover:bg-slate-800"
+        [class.bg-slate-800]="showMenu"
+      >
+        <svg
+          lucideEllipsis
+          [size]="20"
+        ></svg>
+      </button>
+
+      @if (showMenu) {
+        <div class="w-50 h-auto p-2 absolute top-full right-0 bg-slate-800 rounded-md">
+          <button
+            (click)="handleShowModal()"
+            class="text-xs bg-gray-900 btn w-full hover:bg-slate-700"
+          >
+            <svg
+              lucidePlusCircle
+              [size]="17"
+            ></svg>
+            Create new
+          </button>
+        </div>
+      }
+    </div>
+  </header>
+
+  @if (showModal) {
+    <div class="overlay flex justify-center">
+      <div class="max-w-137.5 mt-30 mx-auto w-full">
+        <form
+          (submit)="handleAddNewTask($event)"
+          class="flex items-center h-16.25 bg-slate-700/30 backdrop-blur-[2px] w-full relative rounded-md"
+        >
+          <input
+            [(ngModel)]="newTaskInputValue"
+            name="task"
+            type="text"
+            class="w-full h-full px-3 pr-28 border-none outline-none focus:ring-3 ring-0 ring-transparent focus:ring-blue-500/70"
+            placeholder="Enter new todo here..."
+          />
+          <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500/70 backdrop-blur-[2px] h-12! btn">
+            <svg
+              lucidePlusCircle
+              [size]="20"
+            ></svg>
+            Create
+          </button>
+        </form>
+
+        <div class="mt-7">
+          <h4 class="mb-2">Priority:</h4>
+          <div class="flex items-center gap-4">
+            <label class="flex items-center gap-1 cursor-pointer group">
+              <input
+                type="radio"
+                name="priority"
+                [value]="taskPriority.LOW"
+                [(ngModel)]="selectedPriority"
+                class="appearance-none w-5 h-5 border-2 border-blue-500 rounded-full checked:bg-blue-500 transition-all cursor-pointer"
+              />
+              <span class="text-[15.5px] text-slate-400 select-none group-has-checked:text-blue-400 transition-colors">
+                Low
+              </span>
+            </label>
+
+            <label class="flex items-center gap-1 cursor-pointer group">
+              <input
+                type="radio"
+                name="priority"
+                [value]="taskPriority.MEDIUM"
+                [(ngModel)]="selectedPriority"
+                class="appearance-none w-5 h-5 border-2 border-yellow-500 rounded-full checked:bg-yellow-500 transition-all cursor-pointer"
+              />
+              <span
+                class="text-[15.5px] text-slate-400 group-has-checked:text-yellow-400 select-none transition-colors"
+              >
+                Medium
+              </span>
+            </label>
+
+            <label class="flex items-center gap-1 cursor-pointer group">
+              <input
+                type="radio"
+                name="priority"
+                [value]="taskPriority.HIGH"
+                [(ngModel)]="selectedPriority"
+                class="appearance-none w-5 h-5 border-2 border-red-500 rounded-full checked:bg-red-500 transition-all cursor-pointer"
+              />
+              <span class="text-[15.5px] text-slate-400 group-has-checked:text-red-400 select-none transition-colors">
+                High
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <button
+        (click)="handleCloseModal()"
+        class="absolute top-5 right-5 w-9 h-9 rounded-md bg-red-500/40 hover:bg-red-500/60 transition-all duration-200 backdrop-blur-[2px] flex items-center justify-center cursor-pointer"
+      >
+        <svg
+          lucideXCircle
+          [size]="20"
+        ></svg>
+      </button>
+    </div>
+  }
+
+  <div class="mt-10 flex flex-col gap-2">
+    @for (label of groupLabels; track label) {
+      <section>
+        <h2 class="mb-2 text-lg font-bold text-slate-400 capitalize">{{ label }}</h2>
+
+        <div class="space-y-2">
+          @for (task of groupedTasks[label]; track task.id) {
+            <div class="w-full py-2 bg-slate-800 px-1.5 rounded-md flex items-center">
+              <div class="flex-1 flex items-center gap-2">
+                <div
+                  class="w-5 h-5 rounded-full shrink-0 appearance-none border-2 border-blue-500 relative"
+                  [class.border-yellow-500]="task.priority === taskPriority.MEDIUM"
+                  [class.border-red-500]="task.priority === taskPriority.HIGH"
+                  [class.bg-blue-500]="task.completed && task.priority === taskPriority.LOW"
+                  [class.bg-yellow-500]="task.completed && task.priority === taskPriority.MEDIUM"
+                  [class.bg-red-500]="task.completed && task.priority === taskPriority.HIGH"
+                >
+                  @if (task.completed) {
+                    <svg
+                      lucideCheck
+                      [size]="16"
+                      class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"
+                    ></svg>
+                  }
+                </div>
+                <p
+                  (click)="toggleCompleted(task.id)"
+                  class="text-slate-200 select-none cursor-pointer w-full"
+                >
+                  {{ task.name }}
+                </p>
+              </div>
+              <div class="flex items-center gap-1">
+                <button
+                  type="button"
+                  class="btn-icon hover:bg-violet-500/50"
+                >
+                  <svg
+                    lucidePencil
+                    [size]="18"
+                  ></svg>
+                </button>
+                <button
+                  (click)="deleteTask(task.id)"
+                  type="button"
+                  class="btn-icon hover:bg-red-500/50"
+                >
+                  <svg
+                    lucideTrash2
+                    [size]="18"
+                  ></svg>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    } @empty {
+      <p class="text-center text-red-400/70 font-bold text-2xl">No tasks available</p>
+    }
+  </div>
+</div>
