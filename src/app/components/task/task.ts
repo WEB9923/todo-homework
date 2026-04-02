@@ -4,6 +4,7 @@ import {
   LucideCirclePlus,
   LucideCircleX,
   LucideEllipsis,
+  LucideInfo,
   LucidePencil,
   LucideSettings2,
   LucideTrash2,
@@ -12,6 +13,7 @@ import { TaskModel, TaskPriority } from '../../models/task.model';
 import { FormsModule } from '@angular/forms';
 import { v4 as uuidV4 } from 'uuid';
 import { format, isToday, isYesterday } from 'date-fns';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-task',
@@ -24,6 +26,8 @@ import { format, isToday, isYesterday } from 'date-fns';
     LucidePencil,
     LucideTrash2,
     LucideCheck,
+    LucideInfo,
+    NgClass,
   ],
   templateUrl: './task.html',
   styleUrl: './task.css',
@@ -42,6 +46,12 @@ export class Task implements OnInit {
   tasks: TaskModel[] = [];
   groupedTasks: { [key: string]: TaskModel[] } = {};
   groupLabels: string[] = [];
+
+  priorityInfo: { color: string; label: string }[] = [
+    { color: 'bg-blue-500', label: 'low-priority' },
+    { color: 'bg-yellow-500', label: 'medium priority' },
+    { color: 'bg-red-500', label: 'high priority' },
+  ];
 
   toggleShowMenu = (): boolean => (this.showMenu = !this.showMenu);
 
