@@ -48,7 +48,7 @@ export class Task implements OnInit {
   groupLabels: string[] = [];
 
   priorityInfo: { color: string; label: string }[] = [
-    { color: 'bg-blue-500', label: 'low-priority' },
+    { color: 'bg-blue-500', label: 'low priority' },
     { color: 'bg-yellow-500', label: 'medium priority' },
     { color: 'bg-red-500', label: 'high priority' },
   ];
