@@ -34,6 +34,8 @@ export class Task implements OnInit {
   newTaskInputValue: string = '';
   taskPriority = TaskPriority;
   isPrioritySorted: boolean = false;
+  isEditing: boolean = false;
+  editingTaskId: string | null = null;
 
   selectedPriority: TaskPriority = TaskPriority.LOW;
 
@@ -46,32 +48,42 @@ export class Task implements OnInit {
   handleShowModal(): void {
     this.showMenu = false;
     this.showModal = true;
+    this.isEditing = false;
   }
 
   handleCloseModal = (): boolean => (this.showModal = false);
 
-  handleAddNewTask(evt: SubmitEvent): void {
+  handleSaveTask(evt: SubmitEvent) {
     evt.preventDefault();
 
-    if (!this.newTaskInputValue.trim()) return;
+    if (!this.newTaskInputValue) return;
 
-    const newTask: TaskModel = {
-      id: uuidV4(),
-      name: this.newTaskInputValue,
-      completed: false,
-      createdAt: Date.now(),
-      priority: this.selectedPriority,
-    };
+    if (this.isEditing && this.editingTaskId) {
+      this.tasks = this.tasks.map((task) =>
+        task.id === this.editingTaskId
+          ? { ...task, name: this.newTaskInputValue, priority: this.selectedPriority }
+          : task,
+      );
+    } else {
+      const newTask: TaskModel = {
+        id: uuidV4(),
+        name: this.newTaskInputValue,
+        completed: false,
+        createdAt: Date.now(),
+        priority: this.selectedPriority,
+      };
 
-    this.tasks.unshift(newTask);
+      this.tasks.unshift(newTask);
+    }
+
     this.updateGroups();
-
-    this.newTaskInputValue = '';
-    this.selectedPriority = TaskPriority.LOW;
-
+    this.saveToLocalStorage();
     this.handleCloseModal();
 
-    this.saveToLocalStorage();
+    this.newTaskInputValue = '';
+    this.selectedPriority = this.taskPriority.LOW;
+    this.isEditing = false;
+    this.editingTaskId = null;
   }
 
   updateGroups(): void {
@@ -111,6 +123,14 @@ export class Task implements OnInit {
     this.updateGroups();
 
     this.saveToLocalStorage();
+  }
+
+  editTask(task: TaskModel): void {
+    this.isEditing = true;
+    this.showModal = true;
+    this.editingTaskId = task.id;
+    this.selectedPriority = task.priority;
+    this.newTaskInputValue = task.name;
   }
 
   sortByPriority(): void {

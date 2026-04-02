@@ -45,7 +45,7 @@
     <div class="overlay flex justify-center">
       <div class="max-w-137.5 mt-30 mx-auto w-full">
         <form
-          (submit)="handleAddNewTask($event)"
+          (submit)="handleSaveTask($event)"
           class="flex items-center h-16.25 bg-slate-700/30 backdrop-blur-[2px] w-full relative rounded-md"
         >
           <input
@@ -56,11 +56,19 @@
             placeholder="Enter new todo here..."
           />
           <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500/70 backdrop-blur-[2px] h-12! btn">
-            <svg
-              lucidePlusCircle
-              [size]="20"
-            ></svg>
-            Create
+            @if (!isEditing) {
+              <svg
+                lucidePlusCircle
+                [size]="20"
+              ></svg>
+              Create
+            } @else {
+              <svg
+                lucidePencil
+                [size]="20"
+              ></svg>
+              Edit
+            }
           </button>
         </form>
 
@@ -129,7 +137,10 @@
 
         <div class="space-y-2">
           @for (task of groupedTasks[label]; track task.id) {
-            <div class="w-full py-2 bg-slate-800 px-1.5 rounded-md flex items-center">
+            <div
+              [class.opacity-80]="task.completed"
+              class="w-full py-2 bg-slate-800 px-1.5 rounded-md flex items-center"
+            >
               <div class="flex-1 flex items-center gap-2">
                 <div
                   class="w-5 h-5 rounded-full shrink-0 appearance-none border-2 border-blue-500 relative"
@@ -149,6 +160,7 @@
                 </div>
                 <p
                   (click)="toggleCompleted(task.id)"
+                  [class.text-slate-400]="task.completed"
                   class="text-slate-200 select-none cursor-pointer w-full"
                 >
                   {{ task.name }}
@@ -156,6 +168,7 @@
               </div>
               <div class="flex items-center gap-1">
                 <button
+                  (click)="editTask(task)"
                   type="button"
                   class="btn-icon hover:bg-violet-500/50"
                 >
